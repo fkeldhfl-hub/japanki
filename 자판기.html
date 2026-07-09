@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>자판기 🥤 우리가 만든 노래</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF6EC;
+    --machine-body:#BEE8D8;
+    --machine-dark:#2B2D42;
+    --coral:#FF7F6B;
+    --sky:#78C7F0;
+    --sun:#FFCB47;
+    --ink:#3D3D3D;
+    --paper:#FFFDF7;
+    --slot:#E8F6EF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Gowun Dodum', sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Jua', sans-serif;
+    letter-spacing:0.5px;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  /* NAV - keypad style */
+  nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--machine-dark);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 24px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.15);
+  }
+  nav .brand{
+    color:var(--cream);
+    font-size:22px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  nav .keypad{
+    display:flex;
+    gap:8px;
+  }
+  nav .keypad button{
+    font-family:'Jua', sans-serif;
+    background:var(--cream);
+    color:var(--machine-dark);
+    border:none;
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:13px;
+    cursor:pointer;
+    box-shadow:0 3px 0 rgba(0,0,0,0.25);
+    transition:transform 0.08s ease;
+  }
+  nav .keypad button:hover{background:var(--sun);}
+  nav .keypad button:active{transform:translateY(3px); box-shadow:0 0 0 rgba(0,0,0,0.25);}
+  nav .keypad button.active{
+    background:var(--coral);
+    color:var(--paper);
+  }
+
+  .tab-section{display:none;}
+  .tab-section.active{
+    display:block;
+    animation:fadein 0.25s ease;
+  }
+  @keyframes fadein{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* HERO */
+  .hero{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:64px 20px 40px;
+    text-align:center;
+  }
+  .machine{
+    width:260px;
+    background:var(--machine-body);
+    border:6px solid var(--machine-dark);
+    border-radius:22px;
+    padding:16px;
+    position:relative;
+    box-shadow:0 14px 0 rgba(0,0,0,0.08);
+  }
+  .machine .sign{
+    background:var(--coral);
+    color:var(--paper);
+    font-family:'Jua',sans-serif;
+    font-size:24px;
+    text-align:center;
+    padding:8px 0;
+    border-radius:10px;
+    border:3px solid var(--machine-dark);
+    margin-bottom:12px;
+  }
+  .glass{
+    background:linear-gradient(180deg,#EAF9F1,#D3F0E3);
+    border:4px solid var(--machine-dark);
+    border-radius:12px;
+    height:150px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    position:relative;
+  }
+  .glass .cover{
+    font-size:54px;
+    animation:float 3s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0px) rotate(-3deg);}
+    50%{transform:translateY(-8px) rotate(3deg);}
+  }
+  .coin-slot{
+    margin-top:12px;
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .coin-slot div{
+    flex:1;
+    height:14px;
+    background:var(--machine-dark);
+    border-radius:4px;
+  }
+  .hero h1{
+    margin-top:28px;
+    font-size:15px;
+    color:#8a8a8a;
+  }
+  .hero p.tagline{
+    max-width:420px;
+    font-size:17px;
+    line-height:1.6;
+    margin-top:6px;
+  }
+  .hero .badge{
+    display:inline-block;
+    margin-top:18px;
+    background:var(--sun);
+    padding:6px 16px;
+    border-radius:20px;
+    font-size:13px;
+    border:2px dashed var(--machine-dark);
+  }
+
+  section{
+    max-width:900px;
+    margin:0 auto;
+    padding:60px 20px;
+  }
+  section h2{
+    font-size:26px;
+    text-align:center;
+    margin-bottom:6px;
+  }
+  section .sub{
+    text-align:center;
+    color:#8a8a8a;
+    font-size:14px;
+    margin-bottom:32px;
+  }
+
+  /* SONGS */
+  .song-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:18px;
+  }
+  .song-slot{
+    background:var(--slot);
+    border:3px solid var(--machine-dark);
+    border-radius:16px;
+    padding:16px;
+    position:relative;
+  }
+  .song-slot .num{
+    position:absolute;
+    top:-12px; left:14px;
+    background:var(--machine-dark);
+    color:var(--cream);
+    font-family:'Jua',sans-serif;
+    font-size:12px;
+    padding:2px 8px;
+    border-radius:8px;
+  }
+  .song-slot h3{
+    margin:6px 0 2px;
+    font-size:17px;
+  }
+  .song-slot .who{
+    font-size:12px;
+    color:#8a8a8a;
+    margin-bottom:10px;
+  }
+  .player-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .play-btn{
+    width:38px;height:38px;
+    border-radius:50%;
+    border:2px solid var(--machine-dark);
+    background:var(--coral);
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .bar{
+    flex:1;
+    height:8px;
+    background:#fff;
+    border:2px solid var(--machine-dark);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .bar .fill{
+    height:100%;
+    width:0%;
+    background:var(--sky);
+    transition:width 0.2s linear;
+  }
+  .song-slot .note{
+    font-size:11px;
+    color:#aaa;
+    margin-top:8px;
+  }
+
+  /* MEMBERS */
+  .member-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:16px;
+  }
+  .can{
+    background:var(--paper);
+    border:3px solid var(--machine-dark);
+    border-radius:14px 14px 20px 20px;
+    padding:14px;
+    text-align:center;
+    position:relative;
+  }
+  .can::before{
+    content:"";
+    display:block;
+    height:8px;
+    background:var(--machine-dark);
+    border-radius:6px 6px 0 0;
+    margin:-14px -14px 10px;
+  }
+  .can .avatar{
+    font-size:40px;
+    margin-bottom:6px;
+  }
+  .can h3{font-size:16px;margin:4px 0 2px;}
+  .can .part{
+    font-size:12px;
+    background:var(--sun);
+    display:inline-block;
+    padding:2px 10px;
+    border-radius:10px;
+    margin-bottom:8px;
+  }
+  .can p{font-size:12px;color:#666;line-height:1.5;}
+
+  /* GALLERY */
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:14px;
+  }
+  .capsule{
+    aspect-ratio:1/1;
+    border-radius:50%;
+    border:4px dashed var(--machine-dark);
+    background:linear-gradient(160deg,#fff,var(--slot));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    color:#bbb;
+  }
+
+  /* GUESTBOOK */
+  .receipt-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .receipt-slot{
+    background:var(--machine-dark);
+    border-radius:10px;
+    padding:6px 20px;
+    margin-bottom:-10px;
+    z-index:2;
+  }
+  .receipt-slot span{color:var(--cream);font-size:11px;}
+  .paper-roll{
+    background:var(--paper);
+    width:100%;
+    max-width:420px;
+    border-radius:4px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    padding:22px 20px;
+    font-family:'Gowun Dodum', monospace;
+  }
+  .paper-roll form{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    border-bottom:1px dashed #ccc;
+    padding-bottom:16px;
+    margin-bottom:16px;
+  }
+  .paper-roll input, .paper-roll textarea{
+    font-family:inherit;
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:13px;
+    resize:none;
+  }
+  .paper-roll button{
+    font-family:'Jua',sans-serif;
+    background:var(--coral);
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:10px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .msg{
+    font-size:13px;
+    padding:8px 0;
+    border-bottom:1px dotted #ddd;
+    line-height:1.5;
+  }
+  .msg b{font-family:'Jua',sans-serif;font-size:12px;color:var(--coral);}
+  .empty-note{
+    text-align:center;
+    color:#bbb;
+    font-size:12px;
+    padding:12px 0;
+  }
+
+  footer{
+    text-align:center;
+    padding:40px 20px 60px;
+    font-size:12px;
+    color:#aaa;
+  }
+
+  @media(max-width:480px){
+    nav .keypad{gap:5px;}
+    nav .keypad button{padding:6px 8px;font-size:11px;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">🥤 <span class="display">자판기</span></div>
+  <div class="keypad">
+    <button class="tab-btn active" data-tab="a1" onclick="showTab('a1', this)">A1 노래</button>
+    <button class="tab-btn" data-tab="a2" onclick="showTab('a2', this)">A2 멤버</button>
+    <button class="tab-btn" data-tab="a3" onclick="showTab('a3', this)">A3 갤러리</button>
+    <button class="tab-btn" data-tab="b1" onclick="showTab('b1', this)">B1 방명록</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="machine">
+    <div class="sign">자판기</div>
+    <div class="glass"><div class="cover">🎵</div></div>
+    <div class="coin-slot"><div></div><div></div><div></div><div></div></div>
+  </div>
+  <h1>SINCE 우리가 처음 만난 날</h1>
+  <p class="tagline">번호를 누르면 우리가 함께 부른 노래가<br/>톡, 하고 나와요. 천천히 눌러보세요.</p>
+  <span class="badge">🪙 오늘도 영업중</span>
+</div>
+
+<section id="a1" class="tab-section active">
+  <h2>A1. 노래 재생 플레이어</h2>
+  <p class="sub">버튼을 누르면 뽑혀나와요 (재생/일시정지)</p>
+  <div class="song-grid" id="songGrid"></div>
+</section>
+
+<section id="a2" class="tab-section">
+  <h2>A2. 멤버 소개</h2>
+  <p class="sub">자판기 안에 담긴 사람들</p>
+  <div class="member-grid" id="memberGrid"></div>
+</section>
+
+<section id="a3" class="tab-section">
+  <h2>A3. 사진 갤러리</h2>
+  <p class="sub">뽑기 캡슐 속 우리의 순간들</p>
+  <div class="gallery-grid" id="galleryGrid"></div>
+</section>
+
+<section id="b1" class="tab-section">
+  <div class="receipt-wrap">
+    <div class="receipt-slot"><span>영 수 증 발 급 구</span></div>
+    <div class="paper-roll">
+      <h2 style="margin-top:0;">B1. 방명록</h2>
+      <p class="sub" style="margin-bottom:14px;">응원 한마디를 넣으면 영수증처럼 쌓여요</p>
+      <form id="guestForm">
+        <input id="gName" type="text" placeholder="이름 (닉네임도 좋아요)" maxlength="20" required />
+        <textarea id="gMsg" rows="3" placeholder="응원 메시지를 남겨주세요 🎶" maxlength="200" required></textarea>
+        <button type="submit">🧾 영수증 뽑기</button>
+      </form>
+      <div id="msgList"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  🔌 자판기는 220V로 작동합니다 · 코드를 뽑지 말아주세요 · Made with ❤️
+</footer>
+
+<script>
+  // ---------- 탭 전환 ----------
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  // ---------- 노래 데이터 (여기 수정해서 실제 곡으로 교체하세요) ----------
+  const songs = [
+    { code:"01", title:"노래 제목을 적어주세요", who:"팀 커버 · 전체", src:"" },
+    { code:"02", title:"노래 제목을 적어주세요", who:"솔로 커버", src:"" },
+    { code:"03", title:"노래 제목을 적어주세요", who:"듀엣 커버", src:"" },
+    { code:"04", title:"노래 제목을 적어주세요", who:"팀 커버 · 전체", src:"" },
+  ];
+
+  const songGrid = document.getElementById('songGrid');
+  songs.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'song-slot';
+    el.innerHTML = `
+      <div class="num">${s.code}</div>
+      <h3>${s.title}</h3>
+      <div class="who">${s.who}</div>
+      <div class="player-row">
+        <button class="play-btn" data-i="${i}">▶</button>
+        <div class="bar"><div class="fill" id="fill-${i}"></div></div>
+      </div>
+      <div class="note">🎧 실제 음원 파일을 넣으면 여기서 재생돼요</div>
+    `;
+    songGrid.appendChild(el);
+  });
+
+  // 실제 audio 파일이 없을 때를 위한 데모용 진행바 (src 넣으면 진짜 오디오로 동작)
+  const audios = songs.map(s => s.src ? new Audio(s.src) : null);
+  let demoTimers = {};
+
+  songGrid.querySelectorAll('.play-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = btn.dataset.i;
+      const fill = document.getElementById('fill-' + i);
+      const audio = audios[i];
+
+      if (audio) {
+        if (audio.paused) {
+          audios.forEach(a => a && a.pause());
+          audio.play();
+          btn.textContent = '⏸';
+          audio.ontimeupdate = () => {
+            fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+          };
+        } else {
+          audio.pause();
+          btn.textContent = '▶';
+        }
+      } else {
+        // 데모 모드: 음원 없을 때 진행바만 흉내
+        if (demoTimers[i]) {
+          clearInterval(demoTimers[i]);
+          demoTimers[i] = null;
+          btn.textContent = '▶';
+          return;
+        }
+        songGrid.querySelectorAll('.play-btn').forEach(b => b.textContent = '▶');
+        Object.keys(demoTimers).forEach(k => { clearInterval(demoTimers[k]); demoTimers[k] = null; });
+        btn.textContent = '⏸';
+        let p = 0;
+        demoTimers[i] = setInterval(() => {
+          p += 1;
+          fill.style.width = p + '%';
+          if (p >= 100) { clearInterval(demoTimers[i]); demoTimers[i] = null; btn.textContent = '▶'; fill.style.width = '0%'; }
+        }, 60);
+      }
+    });
+  });
+
+  // ---------- 멤버 데이터 (여기 수정하세요) ----------
+  const members = [
+    { emoji:"🎤", name:"leerinu", part:"보컬", intro:"한줄 소개를 적어주세요" },
+    { emoji:"👑", name:"NSJ전생", part:"보컬", intro:"한줄 소개를 적어주세요" },
+    { emoji:"🍂", name:"가을", part:"보컬", intro:"한줄 소개를 적어주세요" },
+    { emoji:"🌙", name:"미라이", part:"보컬", intro:"한줄 소개를 적어주세요" },
+    { emoji:"🌊", name:"서해", part:"보컬", intro:"한줄 소개를 적어주세요" },
+    { emoji:"👑", name:"아유", part:"보컬", intro:"한줄 소개를 적어주세요" },
+    { emoji:"🍵", name:"유채", part:"보컬", intro:"한줄 소개를 적어주세요" },
+    { emoji:"☕", name:"코체", part:"보컬", intro:"한줄 소개를 적어주세요" },
+  ];
+  const memberGrid = document.getElementById('memberGrid');
+  members.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'can';
+    el.innerHTML = `
+      <div class="avatar">${m.emoji}</div>
+      <h3>${m.name}</h3>
+      <div class="part">${m.part}</div>
+      <p>${m.intro}</p>
+    `;
+    memberGrid.appendChild(el);
+  });
+
+  // ---------- 갤러리 (사진 넣으려면 <img> 로 교체하세요) ----------
+  const galleryGrid = document.getElementById('galleryGrid');
+  for (let i = 0; i < 6; i++) {
+    const el = document.createElement('div');
+    el.className = 'capsule';
+    el.textContent = '📷';
+    galleryGrid.appendChild(el);
+  }
+
+  // ---------- 방명록 (새로고침하면 초기화되는 데모용 · 실서비스엔 서버/DB 필요) ----------
+  const guestForm = document.getElementById('guestForm');
+  const msgList = document.getElementById('msgList');
+  let messages = [];
+
+  function renderMessages() {
+    msgList.innerHTML = '';
+    if (messages.length === 0) {
+      msgList.innerHTML = '<div class="empty-note">아직 도착한 영수증이 없어요</div>';
+      return;
+    }
+    messages.slice().reverse().forEach(m => {
+      const d = document.createElement('div');
+      d.className = 'msg';
+      d.innerHTML = `<b>${m.name}</b> · ${m.msg}`;
+      msgList.appendChild(d);
+    });
+  }
+  renderMessages();
+
+  guestForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('gName').value.trim();
+    const msg = document.getElementById('gMsg').value.trim();
+    if (!name || !msg) return;
+    messages.push({ name, msg });
+    guestForm.reset();
+    renderMessages();
+  });
+</script>
+
+</body>
+</html>
